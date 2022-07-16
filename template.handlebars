@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FTP prog</title>
+</head>
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<style>
+	html {
+		--yellow: #a9a90f;
+		--blue: #5855cf;
+	}
+
+	button {
+		cursor: pointer;
+		font-size: 20px;
+	}
+
+	form button[type=submit] {
+		padding: 8px 16px;
+		background-color: var(--blue, red);
+		color: white;
+		border: none;
+		border-radius: 8px;
+	}
+
+	input[type=text] {
+		font-size: 20px;
+		height: 26px;
+		padding: 2px;
+		border: 1px solid var(--blue, red);
+		border-radius: 6px;
+	}
+
+	button.delete-btn {
+		width: 100%;
+		background: none;
+		border: none;
+		border-radius: 8px;
+		color: var(--blue, red);
+	}
+
+	button.delete-btn:hover {
+		background-color: #5855cf15;
+		box-shadow: 2px 2px 4px 0px #5855cf15;
+	}
+
+	button.delete-btn .material-symbols-outlined {
+		font-size: 18px;
+	}
+
+
+	.files-container {
+		display: grid;
+		grid-template-columns: repeat(10, minmax(150px, 1fr));
+		gap: 24px;
+	}
+
+	@media screen and (max-width: 1440px) {
+		.files-container {
+			grid-template-columns: repeat(8, 150px);
+		}
+	}
+
+	a.item {
+		display: flex;
+		justify-content: center;
+		text-align: center;
+		flex-direction: column;
+		gap: 18px;
+		align-items: center;
+		text-decoration: none;
+		border-radius: 8px;
+		box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.2);
+		padding: 20px 8px;
+		word-break: break-all;
+	}
+
+	a.item>.material-symbols-outlined {
+		font-size: 64px;
+		color: var(--blue, red);
+	}
+
+	.floating-add-button {
+		border-radius: 50%;
+		border: none;
+		box-shadow: 4px 5px 3px 0px rgba(0, 0, 0, 0.2);
+		display: flex;
+		min-width: 60px;
+		min-height: 60px;
+		justify-content: center;
+		align-items: center;
+		position: sticky;
+		right: 10px;
+		bottom: 50px;
+		left: 94vw;
+
+	}
+
+	.floating-add-button>.material-symbols-outlined {
+		font-size: 32px;
+	}
+
+	.modal-container {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.2);
+	}
+
+	.modal-container.hide {
+		display: none;
+	}
+
+
+
+	.modal {
+		max-width: 80vw;
+		max-height: 90vh;
+		background: white;
+		border-radius: 8px;
+		overflow: auto;
+		margin: 0px auto;
+		padding: 8px;
+	}
+
+	button.modal-close {
+		background: transparent;
+		position: relative;
+		left: calc(100vw - 40px);
+		top: 0;
+		border: none;
+		color: white;
+	}
+
+	button.modal-close .material-symbols-outlined {
+		font-size: 32px;
+		font-weight: 800;
+	}
+</style>
+
+<body>
+	<div class="files-container">
+
+		{{#each files}}
+		{{#if isFile}}
+		<a class="folder item" download="" href="{{{path}}}">
+			<span class="material-symbols-outlined">description</span>
+			{{name}}
+			<button class="delete-btn" data-delete-path="{{{path}}}">
+				<span class="material-symbols-outlined"> delete</span>
+			</button>
+		</a>
+		{{else}}
+		<a class="file item" href="{{{path}}}">
+			<span class="material-symbols-outlined">
+				folder
+			</span>
+			{{name}}
+			<button class="delete-btn" data-delete-path="{{{path}}}" data-is-folder="true">
+				<span class="material-symbols-outlined"> delete</span>
+			</button>
+		</a>
+		{{/if}}
+		{{/each}}
+	</div>
+	<button class="floating-add-button" id="add-button">
+		<span class="material-symbols-outlined">
+			add
+		</span>
+	</button>
+	<div class="modal-container hide" id="modal-container">
+		<button id="modal-close" class="modal-close">
+			<span class="material-symbols-outlined">
+				close
+			</span>
+		</button>
+
+		<div class="modal">
+
+		</div>
+	</div>
+</body>
+
+<script>
+	let modalOpenState = false;
+	const modalContainer = document.querySelector("#modal-container");
+	const modal = document.querySelector("#modal-container > .modal");
+	const addItemButton = document.querySelector('#add-button');
+	const filesContainer = document.querySelector('.files-container');
+	const closeModalButton = document.querySelector('#modal-close');
+
+	const uploadFilesFormString = `<form action="/upload" method="post" enctype="multipart/form-data">
+				<label>
+					Save to path:<br />
+					<input type="text" name="filepath" />
+				</label>
+
+				<input type="file" multiple="" name="file" />
+				<button type="submit">Submit</button>
+			</form>`;
+	const HTTP_METHODS = ['post', 'get', 'put', 'patch', 'delete'];
+
+	const request = (method, url, data, callback) => {
+		const XHR = new XMLHttpRequest();
+		if (!HTTP_METHODS.includes(method.toLowerCase()))
+			throw new Error(`Could not find method: ${method}`);
+		XHR.onload = (event) => {
+			if (callback)
+				callback();
+		}
+		console.log({ data });
+		XHR.open(method, url);
+		XHR.setRequestHeader('Content-Type', 'application/json')
+		XHR.send(JSON.stringify(data));
+	}
+
+
+
+	addItemButton.addEventListener('click', () => {
+		if (modalContainer.classList.contains('hide')) {
+			modalContainer.classList.remove('hide');
+			modalOpenState = true;
+			modal.innerHTML = uploadFilesFormString;
+		}
+	});
+
+	closeModalButton.addEventListener('click', () => {
+		if (!modalContainer.classList.contains('hide')) {
+			modalContainer.classList.add('hide');
+			modalOpenState = false;
+		}
+	});
+
+	filesContainer.addEventListener('click', (event) => {
+		if ((event.target.classList.contains('material-symbols-outlined') && event.target.parentElement.classList.contains('delete-btn')) || event.target.classList.contains('delete-btn')) {
+			event.preventDefault();
+			console.log('delete btn detected');
+			const deleteBtn = event.target.classList.contains('material-symbols-outlined') ? event.target.parentElement : event.target;
+			const { deletePath } = deleteBtn.dataset;
+			request('post', '/delete', { deletePath }, () => {
+				deleteBtn.parentElement.parentElement.removeChild(deleteBtn.parentElement);
+			})
+		}
+	})
+
+	document.addEventListener('keyup', (event) => {
+		if ((event.key === 'Esc' || event.key === 'Escape') && modalOpenState) {
+			modalContainer.classList.add('hide');
+		}
+	});
+
+
+
+
+</script>
+
+</html>

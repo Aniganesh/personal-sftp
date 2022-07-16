@@ -1,0 +1,92 @@
+const express = require("express");
+const fsExtra = require("fs-extra");
+const handlebars = require("handlebars");
+const formidable = require("formidable");
+
+const app = express();
+app.use(express.json());
+const PORT = 3000;
+
+app.post("/delete", (req, res) => {
+  const { deletePath } = req.body;
+  if (fsExtra.pathExistsSync(deletePath)) {
+    fsExtra.rmSync(deletePath, { recursive: true });
+    res.sendStatus(204);
+  }
+});
+
+app.post("/upload", async (req, res) => {
+  const form = new formidable.IncomingForm();
+  const files = [];
+  const fields = {};
+  form.on("file", (fieldName, file) => {
+    files.push(file);
+  });
+  form.on("field", (name, value) => {
+    fields[name] = value;
+  });
+  form.parse(req, () => {
+    files.forEach((file, index) => {
+      const oldPath = file.filepath;
+      const newPath = `${fields.filepath}/${file.originalFilename}`;
+      fsExtra.renameSync(oldPath, newPath);
+      console.log(`Saved file ${newPath}`);
+      saveCompletedFileCount++;
+      if (index === files.length - 1) {
+        if (saveCompletedFileCount === files.length) {
+          res.redirect(fields.filepath);
+        } else {
+          res.sendStatus(207);
+        }
+      }
+    });
+  });
+  let saveCompletedFileCount = 0;
+});
+
+app.get("/*", (req, res) => {
+  const currentPath = req.originalUrl.replaceAll("%20", " ");
+  console.log({ currentPath });
+  if (fsExtra.pathExistsSync(currentPath)) {
+    if (fsExtra.lstatSync(currentPath).isDirectory()) {
+      const allFiles = fsExtra.readdirSync(`${currentPath}`, {
+        withFileTypes: true,
+      });
+      const OPTemplate = fsExtra
+        .readFileSync("./template.handlebars")
+        .toString();
+      const folders = [],
+        files = [];
+      allFiles.forEach(({ name }) => {
+        if (fsExtra.lstatSync(`${currentPath}/${name}`).isFile())
+          files.push({
+            name,
+            path: `${
+              currentPath === "/" ? currentPath : `${currentPath}/`
+            }${name}`,
+            isFile: true,
+          });
+        else
+          folders.push({
+            name,
+            path: `${
+              currentPath === "/" ? currentPath : `${currentPath}/`
+            }${name}`,
+            isFile: false,
+          });
+      });
+      const handlebarsTemplateData = {
+        files: folders.concat(files),
+      };
+      const op = handlebars.compile(OPTemplate)(handlebarsTemplateData);
+      res.send(op);
+    } else {
+      const file = fsExtra.readFileSync(currentPath);
+      res.send(file);
+    }
+  } else {
+    res.send("That path does not exist.");
+  }
+});
+
+app.listen(PORT);
