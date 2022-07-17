@@ -1,0 +1,143 @@
+html {
+	--yellow: #a9a90f;
+	--blue: #5855cf;
+}
+
+button {
+	cursor: pointer;
+	font-size: 20px;
+}
+
+form button[type=submit] {
+	padding: 8px 16px;
+	background-color: var(--blue, red);
+	color: white;
+	border: none;
+	border-radius: 8px;
+}
+
+input[type=text] {
+	font-size: 20px;
+	height: 26px;
+	padding: 2px;
+	border: 1px solid var(--blue, red);
+	border-radius: 6px;
+}
+
+button.delete-btn {
+	width: 100%;
+	background: none;
+	border: none;
+	border-radius: 8px;
+	color: var(--blue, red);
+	align-self: baseline;
+}
+
+button.delete-btn:hover {
+	background-color: #5855cf15;
+	box-shadow: 2px 2px 4px 0px #5855cf15;
+}
+
+button.delete-btn .material-symbols-outlined {
+	font-size: 18px;
+}
+
+
+.files-container {
+	display: grid;
+	grid-template-columns: repeat(10, minmax(150px, 1fr));
+	gap: 24px;
+}
+
+@media screen and (max-width: 1440px) {
+	.files-container {
+		grid-template-columns: repeat(8, 150px);
+	}
+}
+
+a.item {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	flex-direction: column;
+	gap: 18px;
+	align-items: center;
+	text-decoration: none;
+	border-radius: 8px;
+	box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.2);
+	padding: 20px 8px;
+	word-break: break-all;
+}
+
+a.item>.material-symbols-outlined {
+	font-size: 64px;
+	color: var(--blue, red);
+}
+
+.item .item-name {
+	display: -webkit-box;
+	-moz-box-orient: vertical;
+	-webkit-box-orient: vertical;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	-webkit-line-clamp: 2;
+}
+
+.floating-add-button {
+	border-radius: 50%;
+	border: none;
+	box-shadow: 4px 5px 3px 0px rgba(0, 0, 0, 0.2);
+	display: flex;
+	min-width: 60px;
+	min-height: 60px;
+	justify-content: center;
+	align-items: center;
+	position: sticky;
+	right: 10px;
+	bottom: 50px;
+	left: 94vw;
+
+}
+
+.floating-add-button>.material-symbols-outlined {
+	font-size: 32px;
+}
+
+.modal-container {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+.modal-container.hide {
+	display: none;
+}
+
+
+
+.modal {
+	max-width: 80vw;
+	max-height: 90vh;
+	background: white;
+	border-radius: 8px;
+	overflow: auto;
+	margin: 0px auto;
+	padding: 8px;
+}
+
+button.modal-close {
+	background: transparent;
+	position: relative;
+	left: calc(100vw - 40px);
+	top: 0;
+	border: none;
+	color: white;
+}
+
+button.modal-close .material-symbols-outlined {
+	font-size: 32px;
+	font-weight: 800;
+}
