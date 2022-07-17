@@ -42,6 +42,7 @@
 		border: none;
 		border-radius: 8px;
 		color: var(--blue, red);
+		align-self: baseline;
 	}
 
 	button.delete-btn:hover {
@@ -83,6 +84,15 @@
 	a.item>.material-symbols-outlined {
 		font-size: 64px;
 		color: var(--blue, red);
+	}
+
+	.item .item-name {
+		display: -webkit-box;
+		-moz-box-orient: vertical;
+		-webkit-box-orient: vertical;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		-webkit-line-clamp: 2;
 	}
 
 	.floating-add-button {
@@ -150,19 +160,23 @@
 
 		{{#each files}}
 		{{#if isFile}}
-		<a class="folder item" download="" href="{{{path}}}">
+		<a class="folder item" download="" href="{{{path}}}" title="{{name}}">
 			<span class="material-symbols-outlined">description</span>
-			{{name}}
+			<span class="item-name">
+				{{name}}
+			</span>
 			<button class="delete-btn" data-delete-path="{{{path}}}">
-				<span class="material-symbols-outlined"> delete</span>
+				<span class="material-symbols-outlined">delete</span>
 			</button>
 		</a>
 		{{else}}
-		<a class="file item" href="{{{path}}}">
+		<a class="file item" href="{{{path}}}" title="{{name}}">
 			<span class="material-symbols-outlined">
 				folder
 			</span>
-			{{name}}
+			<span class="item-name">
+				{{name}}
+			</span>
 			<button class="delete-btn" data-delete-path="{{{path}}}" data-is-folder="true">
 				<span class="material-symbols-outlined"> delete</span>
 			</button>
