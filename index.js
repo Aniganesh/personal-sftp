@@ -2,9 +2,18 @@ const express = require("express");
 const fsExtra = require("fs-extra");
 const handlebars = require("handlebars");
 const formidable = require("formidable");
+const { queryParser } = require("express-query-parser");
 
 const app = express();
 app.use(express.json());
+app.use(
+  queryParser({
+    parseNull: false,
+    parseBoolean: false,
+    parseNumber: false,
+    parseUndefined: false,
+  })
+);
 const PORT = 3000;
 
 app.post("/delete", (req, res) => {
@@ -44,9 +53,8 @@ app.post("/upload", async (req, res) => {
   let saveCompletedFileCount = 0;
 });
 
-app.get("/*", (req, res) => {
-  const currentPath = req.originalUrl.replaceAll("%20", " ");
-  console.log({ currentPath });
+app.get("/files", (req, res) => {
+  const currentPath = req.query.path ?? "/";
   if (fsExtra.pathExistsSync(currentPath)) {
     if (fsExtra.lstatSync(currentPath).isDirectory()) {
       const allFiles = fsExtra.readdirSync(`${currentPath}`, {
@@ -61,7 +69,7 @@ app.get("/*", (req, res) => {
         if (fsExtra.lstatSync(`${currentPath}/${name}`).isFile())
           files.push({
             name,
-            path: `${
+            path: `/files?path=${
               currentPath === "/" ? currentPath : `${currentPath}/`
             }${name}`,
             isFile: true,
@@ -69,7 +77,7 @@ app.get("/*", (req, res) => {
         else
           folders.push({
             name,
-            path: `${
+            path: `/files?path=${
               currentPath === "/" ? currentPath : `${currentPath}/`
             }${name}`,
             isFile: false,
