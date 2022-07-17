@@ -6,6 +6,7 @@ const { queryParser } = require("express-query-parser");
 
 const app = express();
 app.use(express.json());
+app.use(express.static("public"));
 app.use(
   queryParser({
     parseNull: false,
