@@ -12,7 +12,7 @@ const uploadFilesFormString = `<form action="/upload" method="post" enctype="mul
 				</label>
 
 				<input type="file" multiple="" name="file" />
-				<button type="submit">Submit</button>
+				<button class="btn-primary-filled" type="submit">Submit</button>
 			</form>`;
 const HTTP_METHODS = ["post", "get", "put", "patch", "delete"];
 

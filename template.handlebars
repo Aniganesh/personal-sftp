@@ -22,7 +22,7 @@
 			<span class="item-name">
 				{{name}}
 			</span>
-			<button class="delete-btn" data-delete-path="{{{filePath}}}">
+			<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}">
 				<span class="material-symbols-outlined">delete</span>
 			</button>
 		</a>
@@ -34,14 +34,14 @@
 			<span class="item-name">
 				{{name}}
 			</span>
-			<button class="delete-btn" data-delete-path="{{{filePath}}}" data-is-folder="true">
+			<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}" data-is-folder="true">
 				<span class="material-symbols-outlined"> delete</span>
 			</button>
 		</a>
 		{{/if}}
 		{{/each}}
 	</div>
-	<button class="floating-add-button" id="add-button">
+	<button class="btn-floating floating-add-button" id="add-button">
 		<span class="material-symbols-outlined">
 			add
 		</span>

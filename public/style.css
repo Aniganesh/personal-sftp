@@ -1,17 +1,46 @@
 html {
-	--yellow: #a9a90f;
-	--blue: #5855cf;
+	--secondary: #a9a90f;
+	--primary: #5855cf;
+	--black: #333333;
+	--white: #ffffff;
 }
 
 button {
 	cursor: pointer;
 	font-size: 20px;
+	padding: 8px 16px;
+	border-radius: 8px;
+	background: none;
+	border: none;
 }
 
+.btn-plain {
+	background-color: transparent;
+}
+
+.btn-plain:hover {
+	background-color: #5855cf15;
+	box-shadow: 2px 2px 4px 0px #5855cf15;
+}
+
+
+.btn-floating {
+	border-radius: 50%;
+	border: none;
+	box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.2);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: sticky;
+}
+
+.btn-primary-filled {
+	background-color: var(--primary, red);
+}
+
+
 form button[type=submit] {
-	padding: 8px 16px;
-	background-color: var(--blue, red);
-	color: white;
+	color: var(--white, red);
 	border: none;
 	border-radius: 8px;
 }
@@ -20,23 +49,20 @@ input[type=text] {
 	font-size: 20px;
 	height: 26px;
 	padding: 2px;
-	border: 1px solid var(--blue, red);
+	border: 1px solid var(--black, red);
 	border-radius: 6px;
+}
+
+input[type=text]:active, input[type=text]:focus {
+	border-color: var(--primary, red);
 }
 
 button.delete-btn {
 	width: 100%;
-	background: none;
-	border: none;
-	border-radius: 8px;
-	color: var(--blue, red);
+	color: var(--primary, red);
 	align-self: baseline;
 }
 
-button.delete-btn:hover {
-	background-color: #5855cf15;
-	box-shadow: 2px 2px 4px 0px #5855cf15;
-}
 
 button.delete-btn .material-symbols-outlined {
 	font-size: 18px;
@@ -71,7 +97,7 @@ a.item {
 
 a.item>.material-symbols-outlined {
 	font-size: 64px;
-	color: var(--blue, red);
+	color: var(--primary, red);
 }
 
 .item .item-name {
@@ -84,19 +110,12 @@ a.item>.material-symbols-outlined {
 }
 
 .floating-add-button {
-	border-radius: 50%;
-	border: none;
-	box-shadow: 4px 5px 3px 0px rgba(0, 0, 0, 0.2);
-	display: flex;
-	min-width: 60px;
 	min-height: 60px;
-	justify-content: center;
-	align-items: center;
-	position: sticky;
+	min-width: 60px;
 	right: 10px;
 	bottom: 50px;
 	left: 94vw;
-
+	background-color: var(--white, red);
 }
 
 .floating-add-button>.material-symbols-outlined {
@@ -121,7 +140,7 @@ a.item>.material-symbols-outlined {
 .modal {
 	max-width: 80vw;
 	max-height: 90vh;
-	background: white;
+	background: var(--white, red);
 	border-radius: 8px;
 	overflow: auto;
 	margin: 0px auto;
@@ -134,7 +153,7 @@ button.modal-close {
 	left: calc(100vw - 40px);
 	top: 0;
 	border: none;
-	color: white;
+	color: var(--white, red);
 }
 
 button.modal-close .material-symbols-outlined {
