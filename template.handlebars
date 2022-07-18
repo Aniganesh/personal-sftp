@@ -17,24 +17,24 @@
 
 		{{#each files}}
 		{{#if isFile}}
-		<a class="folder item" download="" href="{{{path}}}" title="{{name}}">
+		<a class="folder item" download="" href="{{{pathToRedirect}}}" title="{{name}}">
 			<span class="material-symbols-outlined">description</span>
 			<span class="item-name">
 				{{name}}
 			</span>
-			<button class="delete-btn" data-delete-path="{{{path}}}">
+			<button class="delete-btn" data-delete-path="{{{filePath}}}">
 				<span class="material-symbols-outlined">delete</span>
 			</button>
 		</a>
 		{{else}}
-		<a class="file item" href="{{{path}}}" title="{{name}}">
+		<a class="file item" href="{{{pathToRedirect}}}" title="{{name}}">
 			<span class="material-symbols-outlined">
 				folder
 			</span>
 			<span class="item-name">
 				{{name}}
 			</span>
-			<button class="delete-btn" data-delete-path="{{{path}}}" data-is-folder="true">
+			<button class="delete-btn" data-delete-path="{{{filePath}}}" data-is-folder="true">
 				<span class="material-symbols-outlined"> delete</span>
 			</button>
 		</a>

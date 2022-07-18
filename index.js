@@ -67,20 +67,21 @@ app.get("/files", (req, res) => {
       const folders = [],
         files = [];
       allFiles.forEach(({ name }) => {
-        if (fsExtra.lstatSync(`${currentPath}/${name}`).isFile())
+        const filePath = `${
+          currentPath === "/" ? currentPath : `${currentPath}/`
+        }${name}`;
+        if (fsExtra.lstatSync(filePath).isFile())
           files.push({
             name,
-            path: `/files?path=${
-              currentPath === "/" ? currentPath : `${currentPath}/`
-            }${name}`,
+            filePath,
+            pathToRedirect: `/files?path=${filePath}`,
             isFile: true,
           });
         else
           folders.push({
             name,
-            path: `/files?path=${
-              currentPath === "/" ? currentPath : `${currentPath}/`
-            }${name}`,
+            filePath,
+            pathToRedirect: `/files?path=${filePath}`,
             isFile: false,
           });
       });
@@ -99,3 +100,7 @@ app.get("/files", (req, res) => {
 });
 
 app.listen(PORT);
+
+app.patch("/rename", (req, res) => {
+  res.sendStatus(200);
+});
