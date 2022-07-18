@@ -18,6 +18,8 @@ app.use(
 const PORT = 3000;
 
 app.post("/delete", (req, res) => {
+  res.sendStatus(200);
+  return;
   const { deletePath } = req.body;
   if (fsExtra.pathExistsSync(deletePath)) {
     fsExtra.rmSync(deletePath, { recursive: true });
