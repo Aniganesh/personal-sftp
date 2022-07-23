@@ -14,7 +14,49 @@ const uploadFilesFormString = `<form action="/upload" method="post" enctype="mul
 				<input type="file" multiple="" name="file" />
 				<button class="btn-primary-filled" type="submit">Submit</button>
 			</form>`;
+
+const confirmationDialogString = `<div class="confirmation-dialog">
+				Are you sure you want to delete this?
+				<div class="conf-buttons">
+					<button id="confirm-button--yes" class="btn-primary-filled">
+						Yes
+					</button>
+					<button id="confirm-button--no">No</button>
+				</div>
+			</div>`;
 const HTTP_METHODS = ["post", "get", "put", "patch", "delete"];
+
+const openModal = () => {
+  if (modalContainer.classList.contains("hide")) {
+    modalContainer.classList.remove("hide");
+    modalOpenState = true;
+  }
+};
+const closeModal = () => {
+  if (!modalContainer.classList.contains("hide")) {
+    modalContainer.classList.add("hide");
+    modalOpenState = false;
+    modalContainer.innerHTML = "";
+  }
+};
+
+const withConfirmationDialog = (action) => {
+  modal.innerHTML = confirmationDialogString;
+  const yesButton = modal.querySelector("#confirm-button--yes");
+  openModal();
+  const yesAction = () => {
+    action();
+    yesButton.removeEventListener("click", yesAction);
+    closeModal();
+  };
+  const noAction = () => {
+    closeModal();
+    yesButton.removeEventListener("click", noAction);
+  };
+  yesButton.addEventListener("click", yesAction);
+  noButton = modal.querySelector("#confirm-button--no");
+  noButton.addEventListener("click", noAction);
+};
 
 const request = (method, url, data, callback) => {
   const XHR = new XMLHttpRequest();
@@ -29,19 +71,13 @@ const request = (method, url, data, callback) => {
 };
 
 addItemButton.addEventListener("click", () => {
-  if (modalContainer.classList.contains("hide")) {
-    modalContainer.classList.remove("hide");
-    modalOpenState = true;
-    modal.innerHTML = uploadFilesFormString;
-  }
+  openModal();
+  modal.innerHTML = uploadFilesFormString;
 });
 
 closeModalButton.addEventListener("click", () => {
-  if (!modalContainer.classList.contains("hide")) {
-    modalContainer.classList.add("hide");
-    modalOpenState = false;
-    modal.innerHTML = "";
-  }
+  closeModal();
+  modal.innerHTML = "";
 });
 
 filesContainer.addEventListener("click", (event) => {
@@ -58,10 +94,12 @@ filesContainer.addEventListener("click", (event) => {
       ? event.target.parentElement
       : event.target;
     const { deletePath } = deleteBtn.dataset;
-    request("post", "/delete", { deletePath }, () => {
-      deleteBtn.parentElement.parentElement.removeChild(
-        deleteBtn.parentElement
-      );
+    withConfirmationDialog(() => {
+      request("post", "/delete", { deletePath }, () => {
+        deleteBtn.parentElement.parentElement.removeChild(
+          deleteBtn.parentElement
+        );
+      });
     });
   }
 });

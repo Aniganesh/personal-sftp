@@ -36,6 +36,7 @@ button {
 
 .btn-primary-filled {
 	background-color: var(--primary, red);
+	color: var(--white, red);
 }
 
 
@@ -110,8 +111,8 @@ a.item>.material-symbols-outlined {
 }
 
 .floating-add-button {
-	min-height: 60px;
-	min-width: 60px;
+	height: 60px;
+	width: 60px;
 	right: 10px;
 	bottom: 50px;
 	left: 94vw;
@@ -138,6 +139,7 @@ a.item>.material-symbols-outlined {
 
 
 .modal {
+	width: fit-content;
 	max-width: 80vw;
 	max-height: 90vh;
 	background: var(--white, red);
@@ -159,4 +161,19 @@ button.modal-close {
 button.modal-close .material-symbols-outlined {
 	font-size: 32px;
 	font-weight: 800;
+}
+
+.conf-buttons {
+	margin-left: auto;
+	margin-right: 0;
+	display: flex;
+	gap: 20px;
+	width: fit-content;
+}
+
+.confirmation-dialog {
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
 }
