@@ -25,6 +25,9 @@
 			<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}">
 				<span class="material-symbols-outlined">delete</span>
 			</button>
+			<button class="rename-btn" data-rename-path="{{{filePath}}}" data-is-folder="true">
+				<span class="material-symbols-outlined"> edit</span>
+			</button>
 		</a>
 		{{else}}
 		<a class="file item" href="{{{pathToRedirect}}}" title="{{name}}">
@@ -36,6 +39,9 @@
 			</span>
 			<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}" data-is-folder="true">
 				<span class="material-symbols-outlined"> delete</span>
+			</button>
+			<button class="rename-btn" data-rename-path="{{{filePath}}}" data-is-folder="true">
+				<span class="material-symbols-outlined"> edit</span>
 			</button>
 		</a>
 		{{/if}}
@@ -54,7 +60,7 @@
 		</button>
 
 		<div class="modal">
-
+			
 		</div>
 	</div>
 </body>

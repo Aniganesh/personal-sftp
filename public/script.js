@@ -36,7 +36,7 @@ const closeModal = () => {
   if (!modalContainer.classList.contains("hide")) {
     modalContainer.classList.add("hide");
     modalOpenState = false;
-    modalContainer.innerHTML = "";
+    modal.innerHTML = "";
   }
 };
 
@@ -87,7 +87,7 @@ filesContainer.addEventListener("click", (event) => {
     event.target.classList.contains("delete-btn")
   ) {
     event.preventDefault();
-    console.log("delete btn detected");
+    // console.log("delete btn detected");
     const deleteBtn = event.target.classList.contains(
       "material-symbols-outlined"
     )
@@ -104,8 +104,66 @@ filesContainer.addEventListener("click", (event) => {
   }
 });
 
+filesContainer.addEventListener("click", (event) => {
+  if (
+    (event.target.classList.contains("material-symbols-outlined") &&
+      event.target.parentElement.classList.contains("rename-btn")) ||
+    event.target.classList.contains("rename-btn")
+  ) {
+    event.preventDefault();
+    // console.log("rename btn detected");
+    const renameBtn = event.target.classList.contains(
+      "material-symbols-outlined"
+    )
+      ? event.target.parentElement
+      : event.target;
+    const { renamePath } = renameBtn.dataset;
+    // console.log({ renamePath, dataSet: renameBtn.dataset });
+    const form = document.createElement("form");
+    const splitPath = renamePath.split("/");
+    form.innerHTML = `
+    Current Name: ${splitPath.at(-1)}
+    <br />
+    <label>
+    New name for file or folder<br/>
+    <input type="text" name="newName" value="${splitPath.at(-1)}" />
+    </label>
+    <button type="submit" class="btn-primary-filled">Submit</button>
+    `;
+    modal.appendChild(form);
+    openModal();
+
+    form.onsubmit = (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const formValues = [...formData.entries()].reduce((all, entry) => {
+        all[entry[0]] = entry[1];
+        return all;
+      }, {});
+      // console.log({ event, formValues });
+      request(
+        "PATCH",
+        "/rename",
+        {
+          renamePath,
+          newPath:
+            splitPath.slice(0, splitPath.length - 1).join("/") +
+            "/" +
+            formValues.newName,
+        },
+        () => {
+          closeModal();
+          renameBtn.parentElement.querySelector(".item-name").innerText =
+            formValues.newName;
+          // console.log("submitted");
+        }
+      );
+    };
+  }
+});
+
 document.addEventListener("keyup", (event) => {
   if ((event.key === "Esc" || event.key === "Escape") && modalOpenState) {
-    modalContainer.classList.add("hide");
+    closeModal();
   }
 });

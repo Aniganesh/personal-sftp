@@ -104,5 +104,8 @@ app.get("/files", (req, res) => {
 app.listen(PORT);
 
 app.patch("/rename", (req, res) => {
+  const { renamePath, newPath } = req.body;
+  // console.log({ renamePath, newPath });
+  fsExtra.renameSync(renamePath, newPath);
   res.sendStatus(200);
 });
