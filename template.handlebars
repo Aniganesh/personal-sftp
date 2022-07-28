@@ -22,12 +22,14 @@
 			<span class="item-name">
 				{{name}}
 			</span>
-			<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}">
-				<span class="material-symbols-outlined">delete</span>
-			</button>
-			<button class="rename-btn" data-rename-path="{{{filePath}}}" data-is-folder="true">
-				<span class="material-symbols-outlined"> edit</span>
-			</button>
+			<div class="actionsContainer">
+				<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}">
+					<span class="material-symbols-outlined">delete</span>
+				</button>
+				<button class="rename-btn" data-rename-path="{{{filePath}}}" data-is-folder="true">
+					<span class="material-symbols-outlined"> edit</span>
+				</button>
+			</div>
 		</a>
 		{{else}}
 		<a class="file item" href="{{{pathToRedirect}}}" title="{{name}}">
@@ -37,12 +39,14 @@
 			<span class="item-name">
 				{{name}}
 			</span>
-			<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}" data-is-folder="true">
-				<span class="material-symbols-outlined"> delete</span>
-			</button>
-			<button class="rename-btn" data-rename-path="{{{filePath}}}" data-is-folder="true">
-				<span class="material-symbols-outlined"> edit</span>
-			</button>
+			<div class="actionsContainer">
+				<button class="btn-plain delete-btn" data-delete-path="{{{filePath}}}" data-is-folder="true">
+					<span class="material-symbols-outlined"> delete</span>
+				</button>
+				<button class="rename-btn" data-rename-path="{{{filePath}}}" data-is-folder="true">
+					<span class="material-symbols-outlined"> edit</span>
+				</button>
+			</div>
 		</a>
 		{{/if}}
 		{{/each}}
@@ -60,7 +64,7 @@
 		</button>
 
 		<div class="modal">
-			
+
 		</div>
 	</div>
 </body>
