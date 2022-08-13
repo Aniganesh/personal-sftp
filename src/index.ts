@@ -1,3 +1,4 @@
+import { AUTH_TOKEN_KEY } from "./constants";
 import express, { Request, Response } from "express";
 import fsExtra from "fs-extra";
 import handlebars from "handlebars";
@@ -12,9 +13,9 @@ import dotenv from "dotenv";
 import { NextFunction } from "express-serve-static-core";
 import bodyParser from "body-parser";
 import UserModel, { IUser } from "./Models/user";
+import JWT from "jsonwebtoken";
+import loginRoutes from "./routes/login";
 
-const JWT = require("jsonwebtoken");
-const AUTH_TOKEN_KEY = "authToken";
 dotenv.config();
 
 mongoose.connect(
@@ -50,6 +51,10 @@ function cookieParser(req: Request, res: Response, next: NextFunction) {
 app.use(cookieParser);
 
 const PORT = 3000;
+
+loginRoutes.forEach(({ method, route, callbacks }) => {
+  app[method](route, callbacks);
+});
 
 app.post(
   "/delete",
@@ -115,7 +120,10 @@ app.get(
           withFileTypes: true,
         });
         const OPTemplate = fsExtra
-          .readFileSync("./template.handlebars")
+          .readFileSync(
+            __dirname.split("/").slice(0, -1).join("/") +
+              "/public/template.handlebars"
+          )
           .toString();
         const folders: FileInfo[] = [],
           files: FileInfo[] = [];
@@ -164,7 +172,7 @@ app.patch(
 );
 
 app.get("/login", (req, res) => {
-  res.send(fsExtra.readFileSync("./login-screen.html").toString());
+  res.sendFile("login-screen.html", { root: "public" });
 });
 
 app.post(
@@ -172,8 +180,8 @@ app.post(
   passport.authenticate("local", { session: false }),
   (req, res) => {
     const newJwt = JWT.sign(
-      { name: "Aniruddha", iat: 1516239022 },
-      process.env.SECRET,
+      { name: (req.user as IUser)?._id, iat: Date.now() + 86400 },
+      process.env.SECRET as string,
       {}
     );
     res.cookie(AUTH_TOKEN_KEY, newJwt);

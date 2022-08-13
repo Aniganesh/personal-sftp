@@ -1,11 +1,12 @@
 import { model, Schema } from "mongoose";
 
 export interface IUser {
+  _id: string;
   name: string;
   password: string;
 }
 
-const User = model<IUser>(
+export const User = model<IUser>(
   "User",
   new Schema<IUser>({
     name: String,

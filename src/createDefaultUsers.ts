@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
-const defaultUsers = require("./defaultUsers.json");
-const UserModel = require("./Models/user");
-const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
+import mongoose from "mongoose";
+import defaultUsers from "./defaultUsers.json";
+import UserModel from "./Models/user";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ mongoose.connect(
 
 UserModel.deleteMany().then(() => {
   defaultUsers.forEach(async (user) => {
-    const password = bcrypt.hashSync(user.password, process.env.SALT);
+    const password = bcrypt.hashSync(user.password, process.env.SALT as string);
     const _user = new UserModel({ ...user, password });
     await _user.save();
     console.log(`Added user`, _user);
