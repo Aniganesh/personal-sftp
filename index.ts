@@ -1,16 +1,18 @@
-const express = require("express");
-const fsExtra = require("fs-extra");
-const handlebars = require("handlebars");
-const formidable = require("formidable");
-const { queryParser } = require("express-query-parser");
-const passport = require("passport");
-const bcrypt = require("bcrypt");
-const JwtStrategy = require("passport-jwt").Strategy;
-const LocalStrategy = require("passport-local").Strategy;
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const bodyParser = require("body-parser");
-const UserModel = require("./Models/user");
+import express, { Request, Response } from "express";
+import fsExtra from "fs-extra";
+import handlebars from "handlebars";
+import formidable, { File } from "formidable";
+import { queryParser } from "express-query-parser";
+import passport from "passport";
+import bcrypt from "bcrypt";
+import { Strategy as JwtStrategy, VerifiedCallback } from "passport-jwt";
+import { Strategy as LocalStrategy } from "passport-local";
+import mongoose, { CallbackError } from "mongoose";
+import dotenv from "dotenv";
+import { NextFunction } from "express-serve-static-core";
+import bodyParser from "body-parser";
+import UserModel, { IUser } from "./Models/user";
+
 const JWT = require("jsonwebtoken");
 const AUTH_TOKEN_KEY = "authToken";
 dotenv.config();
@@ -33,10 +35,10 @@ app.use(
   })
 );
 
-function cookieParser(req, res, next) {
+function cookieParser(req: Request, res: Response, next: NextFunction) {
   var cookies = req.headers.cookie;
   if (cookies) {
-    req.cookies = cookies.split(";").reduce((obj, c) => {
+    req.cookies = cookies.split(";").reduce((obj: Record<string, any>, c) => {
       var n = c.split("=");
       obj[n[0].trim()] = n[1].trim();
       return obj;
@@ -52,7 +54,7 @@ const PORT = 3000;
 app.post(
   "/delete",
   passport.authenticate("jwt", { session: false }),
-  (req, res) => {
+  (req, res, next) => {
     res.sendStatus(200);
     return;
     const { deletePath } = req.body;
@@ -68,8 +70,8 @@ app.post(
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     const form = new formidable.IncomingForm();
-    const files = [];
-    const fields = {};
+    const files: File[] = [];
+    const fields: Record<string, string> = {};
     form.on("file", (fieldName, file) => {
       files.push(file);
     });
@@ -96,11 +98,17 @@ app.post(
   }
 );
 
+interface FileInfo {
+  name: string;
+  filePath: string;
+  isFile: boolean;
+  pathToRedirect: string;
+}
 app.get(
   "/files",
   passport.authenticate("jwt", { failureRedirect: "/login", session: false }),
   (req, res) => {
-    const currentPath = req.query.path ?? "/";
+    const currentPath: string = (req.query.path ?? "/") as string;
     if (fsExtra.pathExistsSync(currentPath)) {
       if (fsExtra.lstatSync(currentPath).isDirectory()) {
         const allFiles = fsExtra.readdirSync(`${currentPath}`, {
@@ -109,8 +117,8 @@ app.get(
         const OPTemplate = fsExtra
           .readFileSync("./template.handlebars")
           .toString();
-        const folders = [],
-          files = [];
+        const folders: FileInfo[] = [],
+          files: FileInfo[] = [];
         allFiles.forEach(({ name }) => {
           const filePath = `${
             currentPath === "/" ? currentPath : `${currentPath}/`
@@ -174,7 +182,7 @@ app.post(
 );
 
 const opts = {
-  jwtFromRequest: (req) => {
+  jwtFromRequest: (req: Request) => {
     if (req && req.cookies) {
       return req.cookies[AUTH_TOKEN_KEY];
     }
@@ -194,35 +202,44 @@ passport.use(
       passReqToCallback: false,
     },
     function (username, password, done) {
-      UserModel.findOne({ name: username }, function (err, user) {
-        if (err) {
-          return done(err);
+      UserModel.findOne<IUser>(
+        { name: username },
+        (err: CallbackError, user: IUser) => {
+          if (err) {
+            return done(err);
+          }
+          if (!user) {
+            return done(null, false);
+          }
+          if (bcrypt.compareSync(user.password, password)) {
+            return done(null, false);
+          }
+          return done(null, user);
         }
-        if (!user) {
-          return done(null, false);
-        }
-        if (bcrypt.compareSync(user.password, password)) {
-          return done(null, false);
-        }
-        return done(null, user);
-      });
+      );
     }
   )
 );
 passport.use(
-  new JwtStrategy(opts, (req, jwt_payload, done) => {
-    UserModel.findOne({ id: jwt_payload.sub }, function (err, user) {
-      if (err) {
-        return done(err, false);
-      }
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-        // or you could create a new account
-      }
-    });
-  })
+  new JwtStrategy(
+    opts,
+    (req: Request, jwt_payload: any, done: VerifiedCallback) => {
+      UserModel.findOne(
+        { id: jwt_payload.sub },
+        function (err: CallbackError | null, user?: IUser | null) {
+          if (err) {
+            return done(err, false);
+          }
+          if (user) {
+            return done(null, user);
+          } else {
+            return done(null, false);
+            // or you could create a new account
+          }
+        }
+      );
+    }
+  )
 );
 
 app.get(
