@@ -3,3 +3,4 @@ node_modules/*
 pat.txt
 .env
 defaultUsers.json
+dist

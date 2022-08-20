@@ -13,8 +13,8 @@ const loginScreenRoute: RouteConfig = {
 };
 const loginEndpointRoute: RouteConfig = {
   route: "/login",
+  authenticationMethod: "local",
   callbacks: [
-    passport.authenticate("local", { session: false }),
     (req, res) => {
       const newJwt = JWT.sign(
         { name: (req.user as IUser)?._id, iat: Date.now() + 86400 },
@@ -22,6 +22,8 @@ const loginEndpointRoute: RouteConfig = {
         {}
       );
       res.cookie(AUTH_TOKEN_KEY, newJwt);
+      console.log({ processSetuid: process.setuid });
+      // process.setuid?.(1001);
       res.redirect("/files");
     },
   ],

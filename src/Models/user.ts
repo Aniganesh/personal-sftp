@@ -4,6 +4,7 @@ export interface IUser {
   _id: string;
   name: string;
   password: string;
+  uid?: string | number;
 }
 
 export const User = model<IUser>(
@@ -11,6 +12,7 @@ export const User = model<IUser>(
   new Schema<IUser>({
     name: String,
     password: String,
+    uid: String,
   })
 );
 

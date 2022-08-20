@@ -20,4 +20,5 @@ export interface RouteConfig {
   callbacks: SingleRequestHandler | Array<SingleRequestHandler>;
   method: Method;
   route: string;
+  authenticationMethod?: "jwt" | "local";
 }
