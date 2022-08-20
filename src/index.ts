@@ -18,6 +18,7 @@ const getAuthenticationCallback = (
         failureRedirect: "/login",
       });
     case "local":
+      // console.log("returning local auth callback", passport.authenticate("local", { session: false }));
       return passport.authenticate("local", { session: false });
   }
 };
@@ -26,7 +27,8 @@ allRoutes.forEach(({ method, route, callbacks, authenticationMethod }) => {
   const authCallback = getAuthenticationCallback(authenticationMethod);
   if (authCallback) {
     if (Array.isArray(callbacks)) {
-      callbacks.push(authCallback);
+      callbacks.unshift(authCallback);
+      // console.log({ callbacks });
     } else {
       callbacks = [authCallback].concat(callbacks);
     }
@@ -34,3 +36,4 @@ allRoutes.forEach(({ method, route, callbacks, authenticationMethod }) => {
   console.log(`listening to ${method} requests on ${route}`);
   app[method](route, callbacks);
 });
+console.log({ currentUserId: process.getuid?.() });
