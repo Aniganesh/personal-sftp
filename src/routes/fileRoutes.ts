@@ -74,10 +74,7 @@ const getFilesEndpoint: RouteConfig = {
           withFileTypes: true,
         });
         const OPTemplate = fsExtra
-          .readFileSync(
-            __dirname.split("/").slice(0, -1).join("/") +
-              "/public/template.handlebars"
-          )
+          .readFileSync(process.cwd() + "/public/template.handlebars")
           .toString();
         const folders: FileInfo[] = [],
           files: FileInfo[] = [];
