@@ -5,8 +5,9 @@ import { RouteConfig } from "./types";
 import app from "./init";
 import homeRoutes from "./routes/homeRoutes";
 import "./passport-config";
+import ipWebHook from "./routes/ipwebhook";
 
-const allRoutes = [...loginRoutes, ...fileRoutes, ...homeRoutes];
+const allRoutes = [...loginRoutes, ...fileRoutes, ...homeRoutes, ...ipWebHook];
 
 const getAuthenticationCallback = (
   type: RouteConfig["authenticationMethod"]
@@ -20,6 +21,8 @@ const getAuthenticationCallback = (
     case "local":
       // console.log("returning local auth callback", passport.authenticate("local", { session: false }));
       return passport.authenticate("local", { session: false });
+    default:
+      return;
   }
 };
 
@@ -36,4 +39,4 @@ allRoutes.forEach(({ method, route, callbacks, authenticationMethod }) => {
   console.log(`listening to ${method} requests on ${route}`);
   app[method](route, callbacks);
 });
-console.log({ currentUserId: process.getuid?.() });
+// console.log({ currentUserId: process.getuid?.() });

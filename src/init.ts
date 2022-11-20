@@ -4,7 +4,6 @@ import { queryParser } from "express-query-parser";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
-
 dotenv.config();
 
 mongoose.connect(
