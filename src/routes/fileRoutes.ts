@@ -103,8 +103,8 @@ const getFilesEndpoint: RouteConfig = {
         const op = handlebars.compile(OPTemplate)(handlebarsTemplateData);
         res.send(op);
       } else {
-        const file = fsExtra.readFileSync(currentPath);
-        res.send(file);
+        const fileStream = fsExtra.createReadStream(currentPath);
+        fileStream.pipe(res);
       }
     } else {
       res.send("That path does not exist.");
