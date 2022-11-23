@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "build": "npx tsc -p ./tsconfig.json",
+    "build": "yarn tsc -p ./tsconfig.json",
     "buildStart": "yarn build && yarn start",
     "start": "node dist/index.js",
     "start:dev": "nodemon src/index.ts",
