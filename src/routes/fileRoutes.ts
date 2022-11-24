@@ -132,6 +132,22 @@ const renameFileEndpoint: RouteConfig = {
   ],
 };
 
+const getFileInfoEndpoint: RouteConfig = {
+  method: "get",
+  route: "/file-info",
+  authenticationMethod: "jwt",
+  callbacks: [
+    allowOnlyOwnFileManip,
+    (req, res) => {
+      const path = req.query.path;
+      // TODO: Humanize info
+      if (typeof path === "string" && fsExtra.pathExistsSync(path)) {
+        fsExtra.stat(path).then((stats) => res.json(stats));
+      }
+    },
+  ],
+};
+
 // const fileSearchEndpoint:RouteConfig = {
 //   method: 'get',
 //   route: '/file-search',
@@ -146,4 +162,5 @@ export default [
   uploadFileEndpoint,
   getFilesEndpoint,
   renameFileEndpoint,
+  // getFileInfoEndpoint,
 ];
