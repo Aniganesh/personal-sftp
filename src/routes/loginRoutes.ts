@@ -22,11 +22,11 @@ const loginEndpointRoute: RouteConfig = {
         {}
       );
       res.cookie(AUTH_TOKEN_KEY, newJwt);
-      console.log({ currentUserId: process.getuid?.() });
+      // console.log({ currentUserId: process.getuid?.() });
       // process.setuid?.((req.user as IUser).name as string);
       // console.log({ processSetuid: process.setuid });
       // process.setuid?.(1001);
-      res.redirect("/files");
+      res.redirect(`/files?path=/home/${(req.user as IUser).name}`);
     },
   ],
   method: "post",

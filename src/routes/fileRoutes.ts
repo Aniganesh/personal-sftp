@@ -3,12 +3,14 @@ import { NextFunction, Request, Response } from "express-serve-static-core";
 import formidable, { File } from "formidable";
 import { RouteConfig } from "../types";
 import handlebars from "handlebars";
+import { allowOnlyOwnFileManip } from "../middlewares/allowOnlyOwnFileManip";
 
 const deleteFileEndpoint: RouteConfig = {
   route: "/delete",
   method: "post",
   authenticationMethod: "jwt",
   callbacks: [
+    allowOnlyOwnFileManip,
     (req: Request, res: Response, next: NextFunction) => {
       res.sendStatus(200);
       return;
@@ -26,6 +28,7 @@ const uploadFileEndpoint: RouteConfig = {
   route: "/upload",
   authenticationMethod: "jwt",
   callbacks: [
+    allowOnlyOwnFileManip,
     async (req, res) => {
       const form = new formidable.IncomingForm();
       const files: File[] = [];
@@ -66,62 +69,77 @@ const getFilesEndpoint: RouteConfig = {
   method: "get",
   route: "/files",
   authenticationMethod: "jwt",
-  callbacks: (req, res) => {
-    const currentPath: string = (req.query.path ?? "/") as string;
-    if (fsExtra.pathExistsSync(currentPath)) {
-      if (fsExtra.lstatSync(currentPath).isDirectory()) {
-        const allFiles = fsExtra.readdirSync(`${currentPath}`, {
-          withFileTypes: true,
-        });
-        const OPTemplate = fsExtra
-          .readFileSync(process.cwd() + "/public/template.handlebars")
-          .toString();
-        const folders: FileInfo[] = [],
-          files: FileInfo[] = [];
-        allFiles.forEach(({ name }) => {
-          const filePath = `${
-            currentPath === "/" ? currentPath : `${currentPath}/`
-          }${name}`;
-          if (fsExtra.lstatSync(filePath).isFile())
-            files.push({
-              name,
-              filePath,
-              pathToRedirect: `/files?path=${filePath}`,
-              isFile: true,
-            });
-          else
-            folders.push({
-              name,
-              filePath,
-              pathToRedirect: `/files?path=${filePath}`,
-              isFile: false,
-            });
-        });
-        const handlebarsTemplateData = {
-          files: folders.concat(files),
-        };
-        const op = handlebars.compile(OPTemplate)(handlebarsTemplateData);
-        res.send(op);
+  callbacks: [
+    allowOnlyOwnFileManip,
+    (req, res) => {
+      const currentPath: string = (req.query.path ?? "/") as string;
+      if (fsExtra.pathExistsSync(currentPath)) {
+        if (fsExtra.lstatSync(currentPath).isDirectory()) {
+          const allFiles = fsExtra.readdirSync(`${currentPath}`, {
+            withFileTypes: true,
+          });
+          const OPTemplate = fsExtra
+            .readFileSync(process.cwd() + "/public/template.handlebars")
+            .toString();
+          const folders: FileInfo[] = [],
+            files: FileInfo[] = [];
+          allFiles.forEach(({ name }) => {
+            const filePath = `${
+              currentPath === "/" ? currentPath : `${currentPath}/`
+            }${name}`;
+            if (fsExtra.lstatSync(filePath).isFile())
+              files.push({
+                name,
+                filePath,
+                pathToRedirect: `/files?path=${filePath}`,
+                isFile: true,
+              });
+            else
+              folders.push({
+                name,
+                filePath,
+                pathToRedirect: `/files?path=${filePath}`,
+                isFile: false,
+              });
+          });
+          const handlebarsTemplateData = {
+            files: folders.concat(files),
+          };
+          const op = handlebars.compile(OPTemplate)(handlebarsTemplateData);
+          res.send(op);
+        } else {
+          const fileStream = fsExtra.createReadStream(currentPath);
+          fileStream.pipe(res);
+        }
       } else {
-        const fileStream = fsExtra.createReadStream(currentPath);
-        fileStream.pipe(res);
+        res.send("That path does not exist.");
       }
-    } else {
-      res.send("That path does not exist.");
-    }
-  },
+    },
+  ],
 };
 
 const renameFileEndpoint: RouteConfig = {
   method: "patch",
   route: "/rename",
   authenticationMethod: "jwt",
-  callbacks: (req, res) => {
-    const { renamePath, newPath } = req.body;
-    fsExtra.renameSync(renamePath, newPath);
-    res.sendStatus(200);
-  },
+  callbacks: [
+    allowOnlyOwnFileManip,
+    (req, res) => {
+      const { renamePath, newPath } = req.body;
+      fsExtra.renameSync(renamePath, newPath);
+      res.sendStatus(200);
+    },
+  ],
 };
+
+// const fileSearchEndpoint:RouteConfig = {
+//   method: 'get',
+//   route: '/file-search',
+//   authenticationMethod: 'jwt',
+//   callbacks: (reqallowOnlyOwnFileManip,res)=>{
+
+//   }
+// }
 
 export default [
   deleteFileEndpoint,
