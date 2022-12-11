@@ -51,7 +51,7 @@ passport.use(
     opts,
     (req: Request, jwt_payload: any, done: VerifiedCallback) => {
       UserModel.findOne(
-        { id: jwt_payload.sub },
+        { _id: jwt_payload.id },
         function (err: CallbackError | null, user?: IUser | null) {
           if (err) {
             return done(err, false);

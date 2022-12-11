@@ -17,7 +17,7 @@ const loginEndpointRoute: RouteConfig = {
   callbacks: [
     async (req, res) => {
       const newJwt = JWT.sign(
-        { name: (req.user as IUser)?._id, iat: Date.now() + 86400 },
+        { id: (req.user as IUser)?._id, iat: Date.now() + 86400 },
         process.env.SECRET as string,
         {}
       );

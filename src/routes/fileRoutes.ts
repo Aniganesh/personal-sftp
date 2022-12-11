@@ -3,14 +3,14 @@ import { NextFunction, Request, Response } from "express-serve-static-core";
 import formidable, { File } from "formidable";
 import { RouteConfig } from "../types";
 import handlebars from "handlebars";
-// import { allowOnlyOwnFileManip } from "../middlewares/allowOnlyOwnFileManip";
+import { allowOnlyOwnFileManip } from "../middlewares/allowOnlyOwnFileManip";
 
 const deleteFileEndpoint: RouteConfig = {
   route: "/delete",
   method: "post",
   authenticationMethod: "jwt",
   callbacks: [
-    // allowOnlyOwnFileManip,
+    allowOnlyOwnFileManip,
     (req: Request, res: Response, next: NextFunction) => {
       res.sendStatus(200);
       return;
@@ -28,7 +28,7 @@ const uploadFileEndpoint: RouteConfig = {
   route: "/upload",
   authenticationMethod: "jwt",
   callbacks: [
-    // allowOnlyOwnFileManip,
+    allowOnlyOwnFileManip,
     async (req, res) => {
       const form = new formidable.IncomingForm();
       const files: File[] = [];
@@ -70,7 +70,7 @@ const getFilesEndpoint: RouteConfig = {
   route: "/files",
   authenticationMethod: "jwt",
   callbacks: [
-    // allowOnlyOwnFileManip,
+    allowOnlyOwnFileManip,
     (req, res) => {
       const currentPath: string = (req.query.path ?? "/") as string;
       if (fsExtra.pathExistsSync(currentPath)) {
@@ -123,7 +123,7 @@ const renameFileEndpoint: RouteConfig = {
   route: "/rename",
   authenticationMethod: "jwt",
   callbacks: [
-    // allowOnlyOwnFileManip,
+    allowOnlyOwnFileManip,
     (req, res) => {
       const { renamePath, newPath } = req.body;
       fsExtra.renameSync(renamePath, newPath);
@@ -137,7 +137,7 @@ const getFileInfoEndpoint: RouteConfig = {
   route: "/file-info",
   authenticationMethod: "jwt",
   callbacks: [
-    // allowOnlyOwnFileManip,
+    allowOnlyOwnFileManip,
     (req, res) => {
       const path = req.query.path;
       // TODO: Humanize info
@@ -152,7 +152,7 @@ const getFileInfoEndpoint: RouteConfig = {
 //   method: 'get',
 //   route: '/file-search',
 //   authenticationMethod: 'jwt',
-//   callbacks: (reqallowOnlyOwnFileManip,res)=>{
+//   callbacks: (req, allowOnlyOwnFileManip,res)=>{
 
 //   }
 // }

@@ -12,11 +12,9 @@ export const allowOnlyOwnFileManip: RequestHandler = (req, res, next) => {
     ) {
       next();
     } else if (typeof currentPath === "string") {
-      res
-        .status(403)
-        .json({
-          message: "You're not allowed to view/manipulate this(these) file(s)",
-        });
+      res.status(403).json({
+        message: "You're not allowed to view/manipulate this(these) file(s)",
+      });
     }
   }
 };
