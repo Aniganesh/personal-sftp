@@ -12,8 +12,8 @@ const deleteFileEndpoint: RouteConfig = {
   callbacks: [
     allowOnlyOwnFileManip,
     (req: Request, res: Response, next: NextFunction) => {
-      res.sendStatus(200);
-      return;
+      // res.sendStatus(200);
+      // return;
       const { deletePath } = req.body;
       if (fsExtra.pathExistsSync(deletePath)) {
         fsExtra.rmSync(deletePath, { recursive: true });
