@@ -4,3 +4,5 @@ pat.txt
 .env
 defaultUsers.json
 dist
+
+.vscode/*
